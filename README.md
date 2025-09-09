@@ -36,20 +36,25 @@ https://id.twitch.tv/oauth2/authorize?client_id=DEINE_CLIENT_ID&redirect_uri=htt
 3. Du wirst zu `http://localhost/#access_token=...` weitergeleitet
 4. Kopiere den **Access Token** aus der URL
 
-## 3. Konfiguration
+## 3. Konfiguration (SICHER)
 
-Bearbeite die `config.json` Datei:
+**WICHTIG**: Deine Twitch API-Credentials werden jetzt sicher in einer `.env` Datei gespeichert, die nicht auf GitHub gepusht wird.
 
-```json
-{
-    "channel": "montanablack88",
-    "quality": "720p",
-    "output_directory": "./downloads",
-    "twitch": {
-        "client_id": "deine_echte_client_id_hier",
-        "access_token": "dein_echter_access_token_hier"
-    }
-}
+### Schritt 1: .env Datei erstellen
+```bash
+cp .env.template .env
+```
+
+### Schritt 2: .env Datei bearbeiten
+Öffne die `.env` Datei und fülle deine echten Credentials ein:
+
+```env
+# Twitch API Credentials
+TWITCH_CLIENT_ID=deine_echte_client_id_hier
+TWITCH_ACCESS_TOKEN=dein_echter_access_token_hier
+TWITCH_CHANNEL=montanablack88
+DOWNLOAD_QUALITY=720p
+OUTPUT_DIRECTORY=./downloads
 ```
 
 ### Verfügbare Qualitätsstufen:
@@ -61,7 +66,7 @@ Bearbeite die `config.json` Datei:
 ## 4. Verwendung
 
 ```bash
-python twitch_vod_downloader.py
+python TwitchVODDownloader.py
 ```
 
 Das Skript wird:
@@ -75,18 +80,36 @@ Die Downloads werden im konfigurierten Verzeichnis gespeichert:
 - **Video**: `kanal_datum_titel.mp4`
 - **Info**: `kanal_datum_title.txt`
 
+## Sicherheit
+
+- Die `.env` Datei enthält deine sensiblen API-Credentials und wird **NICHT** auf GitHub gepusht
+- Die `.gitignore` Datei sorgt dafür, dass sensible Dateien ausgeschlossen werden
+- Verwende niemals echte Credentials in der `.env.template` Datei
+
 ## Fehlerbehebung
+
+### "Folgende Umgebungsvariablen sind nicht gesetzt"
+Stelle sicher, dass du eine `.env` Datei erstellt und alle erforderlichen Variablen ausgefüllt hast.
 
 ### "Streamlink ist nicht installiert"
 ```bash
 pip install streamlink
 ```
 
-### "Konfigurationsdatei nicht gefunden"
-Stelle sicher, dass die `config.json` im gleichen Verzeichnis wie das Skript liegt.
-
 ### "Fehler beim Abrufen der User-ID: 401"
 Dein Access Token ist ungültig oder abgelaufen. Generiere einen neuen Token.
 
 ### "Benutzer nicht gefunden"
-Überprüfe die Schreibweise des Kanal-Namens in der config.json.
+Überprüfe die Schreibweise des Kanal-Namens in der `.env` Datei.
+
+## GitHub Push
+
+Du kannst jetzt sicher auf GitHub pushen, ohne dass deine API-Credentials preisgegeben werden:
+
+```bash
+git add .
+git commit -m "Secure credential management with environment variables"
+git push
+```
+
+Die `.env` Datei wird automatisch ignoriert und nicht hochgeladen.
