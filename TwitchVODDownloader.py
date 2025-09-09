@@ -11,40 +11,24 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from dotenv import load_dotenv
 
 class TwitchVODDownloader:
-    def __init__(self):
-        # Lade Umgebungsvariablen aus .env Datei
-        load_dotenv()
-        
-        # Validiere, dass alle erforderlichen Umgebungsvariablen gesetzt sind
-        required_vars = ['TWITCH_CLIENT_ID', 'TWITCH_ACCESS_TOKEN', 'TWITCH_CHANNEL']
-        missing_vars = [var for var in required_vars if not os.getenv(var)]
-        
-        if missing_vars:
-            print("Fehler: Folgende Umgebungsvariablen sind nicht gesetzt:")
-            for var in missing_vars:
-                print(f"  - {var}")
-            print("\nStelle sicher, dass du eine .env Datei erstellt hast.")
-            print("Kopiere .env.template zu .env und fülle deine Credentials ein.")
-            sys.exit(1)
-        
-        # Lade Konfiguration aus Umgebungsvariablen
-        self.config = {
-            'channel': os.getenv('TWITCH_CHANNEL'),
-            'quality': os.getenv('DOWNLOAD_QUALITY', '720p'),
-            'output_directory': os.getenv('OUTPUT_DIRECTORY', './downloads'),
-            'twitch': {
-                'client_id': os.getenv('TWITCH_CLIENT_ID'),
-                'access_token': os.getenv('TWITCH_ACCESS_TOKEN')
-            }
-        }
-        
+    def __init__(self, config_path="config.json"):
+        self.config = self.load_config(config_path)
         self.headers = {
             'Client-ID': self.config['twitch']['client_id'],
             'Authorization': f'Bearer {self.config["twitch"]["access_token"]}'
         }
+        
+    def load_config(self, config_path):
+        """Lädt die Konfigurationsdatei"""
+        if not os.path.exists(config_path):
+            print(f"Konfigurationsdatei '{config_path}' nicht gefunden!")
+            print("Erstelle eine config.json Datei mit deinen Twitch API Daten.")
+            sys.exit(1)
+            
+        with open(config_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
     
     def get_user_id(self, username):
         """Ermittelt die User-ID für einen Twitch-Benutzernamen"""
